@@ -79,7 +79,6 @@ set shiftwidth=2 "自動インデントでずれる幅
 set softtabstop=2 "連続した空白に対してタブキーやバックスペースキーでカーソルが動く幅
 set autoindent "改行時に前の行のインデントを継続する
 set smartindent "改行時に入力された行の末尾に合わせて次の行のインデントを増減する
-
 map ,pt :%! perltidy
 
 
@@ -87,16 +86,30 @@ if has('vim_starting')
   set runtimepath+=~/.vim/bundle/neobundle.vim
   call neobundle#begin(expand('~/.vim/bundle/'))
 NeoBundleFetch 'Shougo/neobundle.vim'
-call neobundle#end()
-endif 
 
 
+" -------------------------------------
 NeoBundle 'Shougo/unite.vim'
+NeoBundle 'Shougo/vimfiler'
 NeoBundle 'Shougo/neocomplete'
 NeoBundle 'Shougo/neosnippet'
 NeoBundle 'Shougo/neosnippet-snippets'
 NeoBundle 'scrooloose/syntastic.git'
 NeoBundle 'mattn/emmet-vim'
+NeoBundle 'Shougo/vimproc', {
+   \ 'build' : {
+        \ 'windows' : 'make -f make_mingw32.mak',
+           \ 'cygwin' : 'make -f make_cygwin.mak',
+              \ 'mac' : 'make -f make_mac.mak',
+                 \ 'unix' : 'make -f make_unix.mak',
+                  \ },
+                  \ }
+" -------------------------------------
+
+
+
+call neobundle#end()
+endif 
 
 " Plugin key-mappings.
 imap <C-k>     <Plug>(neosnippet_expand_or_jump)
@@ -116,6 +129,13 @@ if has('conceal')
   set conceallevel=2 concealcursor=niv
 endif
 
+let g:neocomplete#enable_at_startup = 1
+let g:neocomplete#enable_ignore_case = 1
+let g:neocomplete#enable_smart_case = 1
+ if !exists('g:neocomplete#keyword_patterns')
+        let g:neocomplete#keyword_patterns = {}
+    endif
+    let g:neocomplete#keyword_patterns._ = '\h\w*'
 
 let g:syntastic_enable_perl_checker = 1
 
@@ -125,6 +145,7 @@ let g:neosnippet#enable_snipmate_compatibility = 1
 " Tell Neosnippet about the other snippets
 let g:neosnippet#snippets_directory='~/.vim/bundle/vim-snippets/snippets'
 
+let g:vimfiler_as_default_explorer=1
 
 map ,ptv :'<,'>! perltidy
 
