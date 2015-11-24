@@ -89,6 +89,7 @@ NeoBundleFetch 'Shougo/neobundle.vim'
 
 
 " -------------------------------------
+NeoBundle 'vim-ruby/vim-ruby'
 NeoBundle 'Shougo/unite.vim'
 NeoBundle 'Shougo/vimfiler'
 NeoBundle 'Shougo/neocomplete'
@@ -97,13 +98,25 @@ NeoBundle 'Shougo/neosnippet-snippets'
 NeoBundle 'scrooloose/syntastic.git'
 NeoBundle 'mattn/emmet-vim'
 NeoBundle 'Shougo/vimproc', {
-   \ 'build' : {
-        \ 'windows' : 'make -f make_mingw32.mak',
-           \ 'cygwin' : 'make -f make_cygwin.mak',
-              \ 'mac' : 'make -f make_mac.mak',
-                 \ 'unix' : 'make -f make_unix.mak',
-                  \ },
-                  \ }
+  \ 'build' : {
+  \     'mac' : 'make -f make_mac.mak',
+  \     'unix' : 'make -f make_unix.mak',
+  \    },
+  \ }
+NeoBundleLazy 'supermomonga/neocomplete-rsense.vim', { 'autoload' : {
+  \ 'insert' : 1,
+  \ 'filetypes': 'ruby',
+  \ }}
+
+" .や::を入力したときにオムニ補完が有効になるようにする
+if !exists('g:neocomplete#force_omni_input_patterns')
+  let g:neocomplete#force_omni_input_patterns = {}
+endif
+let g:neocomplete#force_omni_input_patterns.ruby = '[^. *\t]\.\w*\|\h\w*::'
+
+" 環境変数RSENSE_HOMEに'/usr/local/bin/rsense'を指定しても動く
+let g:neocomplete#sources#rsense#home_directory = '/usr/local/bin/rsense'
+
 " -------------------------------------
 
 
@@ -136,8 +149,9 @@ let g:neocomplete#enable_smart_case = 1
         let g:neocomplete#keyword_patterns = {}
     endif
     let g:neocomplete#keyword_patterns._ = '\h\w*'
+let g:syntastic_mode_map = { 'mode': 'active',
+            \ 'active_filetypes': ['ruby'] }
 
-let g:syntastic_enable_perl_checker = 1
 
 " Enable snipMate compatibility feature.
 let g:neosnippet#enable_snipmate_compatibility = 1
@@ -148,5 +162,10 @@ let g:neosnippet#snippets_directory='~/.vim/bundle/vim-snippets/snippets'
 let g:vimfiler_as_default_explorer=1
 
 map ,ptv :'<,'>! perltidy
+set nocompatible      " We're running Vim, not Vi!
+syntax on             " Enable syntax highlighting
+filetype on           " Enable filetype detection
+filetype indent on    " Enable filetype-specific indenting
+filetype plugin on    " Enable filetype-specific plugins
 
 syntax on 
