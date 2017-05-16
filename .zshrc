@@ -77,7 +77,7 @@ stty -ixon
 bindkey '^s' peco-src
 export PATH=$HOME/bin:/usr/local/bin:$PATH
 # export MANPATH="/usr/local/man:$MANPATH"
-export GOPATH="$HOME"
+export GOPATH="$HOME/.go"
 export PATH="$PATH:$GOPATH/bin"
 export PATH="$HOME/.rbenv/bin:$PATH"
 eval "$(rbenv init -)"
