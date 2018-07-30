@@ -1,13 +1,18 @@
 # Path to your oh-my-zsh installation.
-export ZSH=$HOME/.oh-my-zsh
+export ZSH=$HOME
 
+source ~/antigen.zsh
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
-ZSH_THEME="philips"
-
-export PATH=/usr/local/bin:/usr/bin:$PATH
+antigen use oh-my-zsh
+antigen bundle autojunp
+antigen bundle git
+antigen bundle command-not-found
+antigen bundle zsh-users/zsh-syntax-highlighting
+antigen bundle mollifier/anyframe
+antigen theme philips
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
 
@@ -46,15 +51,54 @@ export PATH=/usr/local/bin:/usr/bin:$PATH
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
 
 # User configuration
-
+function peco-src() {
+    local selected_dir=$(ghq list | peco --query "$LBUFFER")
+    if [ -n "$selected_dir" ]; then
+        BUFFER="cd ${GOPATH}/src/${selected_dir}"
+        zle accept-line
+    fi
+    zle redisplay
+}
+zle -N peco-src
+stty -ixon
+bindkey '^s' peco-src
+function peco-select-history() {
+    local tac
+    if which tac > /dev/null; then
+        tac="tac"
+    else
+        tac="tail -r"
+    fi
+    BUFFER=$(\history -n 1 | \
+        eval $tac | \
+        peco --query "$LBUFFER")
+    CURSOR=$#BUFFER
+    zle clear-screen
+}
+zle -N peco-select-history
+bindkey '^e' peco-select-history
+alias -g B='`git branch | peco | sed -e "s/^\*[ ]*//g"`'
+function peco-src() {
+    local selected_dir=$(ghq list | peco --query "$LBUFFER")
+    if [ -n "$selected_dir" ]; then
+        BUFFER="cd ${GOPATH}/src/${selected_dir}"
+        zle accept-line
+    fi
+    zle redisplay
+}
+zle -N peco-src
+stty -ixon
+bindkey '^s' peco-src
 export PATH=$HOME/bin:/usr/local/bin:$PATH
 # export MANPATH="/usr/local/man:$MANPATH"
-
-source $ZSH/oh-my-zsh.sh
-
+export GOPATH_LIB=$HOME/.go
+export GOPATH_DEV=$HOME/develop/go
+export GOPATH=$GOPATH_DEV:$GOPATH_LIB
+export PATH=$PATH:$GOPATH_LIB/bin
+export PATH="$HOME/.rbenv/bin:$PATH"
+eval "$(rbenv init -)"
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
 
@@ -79,6 +123,12 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-
+ENHANCD_FILTER=peco; export ENHANCD_FILTER
 alias vf='vim +VimFiler'
-if which rbenv > /dev/null; then eval "$(rbenv init -)"; fi
+# enhancd
+if [ -f "/Users/yuta.tanimura/.enhancd/zsh/enhancd.zsh" ]; then
+    source "/Users/yuta.tanimura/.enhancd/zsh/enhancd.zsh"
+fi
+antigen bundle mollifier/anyframe
+zstyle ":anyframe:selector:" use peco
+antigen apply
